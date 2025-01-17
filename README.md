@@ -214,28 +214,29 @@ AL: 8 bits
 
 ### Registros en assembler
 ```
-Registros  |                | Subregistros   | Descripción
------------|----------------|----------------|----------------------------
-EAX        |                |  AH   AX   AL  | Acumulador (✓)
-EBX        |                |  BH   BX   BL  | Índice base  (✓)
-ECX        |                |  CH   CX   CL  | Conteo  (✓)
-EDX        |                |  DH   DX   DL  | Datos  (✓)
-ESP        |                |       SP       | Apuntador de la pila
-EDI        |                |       DI       | Apuntador de la base
-ESI        |                |       SI       | Índice de deestino  (✓)
-EBP        |                |       BP       | Índice de origen  (✓)
+          |     16 bits     | 8 bits | 8 bits |
+Registros |                 | Subregistros    | Descripción
+----------|-----------------|-----------------|----------------------------
+EAX       |                 |  AH   AX   AL   | Acumulador (✓)
+EBX       |                 |  BH   BX   BL   | Índice base  (✓)
+ECX       |                 |  CH   CX   CL   | Conteo  (✓)
+EDX       |                 |  DH   DX   DL   | Datos  (✓)
+ESP       |                 |       SP        | Apuntador de la pila
+EDI       |                 |       DI        | Apuntador de la base
+ESI       |                 |       SI        | Índice de deestino  (✓)
+EBP       |                 |       BP        | Índice de origen  (✓)
     
-EIP        |                |       IP       | Apuntador de instrucciones
-EFLAGS     |                |     EFLAGS     | Banderas  (✓)
+EIP       |                 |       IP        | Apuntador de instrucciones
+EFLAGS    |                 |     EFLAGS      | Banderas  (✓)
 
-                            |    Segmento    | Descripción
-                            |----------------|----------------------------
-                            |       CS       | Código
-                            |       DS       | Datos
-                            |       ES       | Extra
-                            |       SS       | Pila
-                            |       FS       |
-                            |       GS       |
+                            |    Segmentos    | Descripción
+                            |-----------------|----------------------------
+                            |       CS        | Código
+                            |       DS        | Datos
+                            |       ES        | Extra
+                            |       SS        | Pila
+                            |       FS        |
+                            |       GS        |
 ```
 
 ### Registros multipropósito
@@ -248,4 +249,100 @@ EFLAGS     |                |     EFLAGS     | Banderas  (✓)
 
 ### Registros de propósito especial:
 + **EFLAGS (banderas)**: registro que guarda en cada bit un 1 o 0 para indicar si cumple o no algún estado.
-+ **()**:
+
+## Instrucciones y operadores
+### Operadores principales
+#### Operador MOV
+```asm
+MOV var1, var2
+```
++ Lo que hace el operador **MOV** es asignarle a var1 el valor de var2.
+#### Aritméticos
++ Suma: ADD
+    ```asm
+    ; Operación: 1000 + 999 = 1999
+    mov ax, 1000d
+    mov bx, 999d
+    add ax, bx  ; suma ax mas bx y lo guarda en ax
+    ```
++ Resta: SUB
+    ```asm
+    ; Operación: 300 - 255 = 45
+    mov ax, 300d
+    mov bx, 255d
+    sub ax, bx  ; resta ax menos bx y lo guarda en ax
+    ```
++ Multiplicación: MUL
+    ```asm
+    ; Operación: 11 * 255 = 2805
+    mov ax, 255d
+    mov bx, 11d
+    mul bx  ; multiplica ax por bx y lo guarda en ax
+    ```
++ División: DIV
+    ```asm
+    ; Operación: 1000 / 100 = 10
+    mov ax, 1000d   ; el numerador debe ir aquí
+    mov bx, 100d    ; el denominador debe ir aquí
+    div bx  ; divide ax entre bx y lo guarda en ax
+    ```
+
+#### Lógicos
++ Y: AND
+    ```asm
+    ; Operación: 214 and 91
+    ; 11010110b es 214 en binario
+    ; 01011011b es 91 en binario
+    ; 11010110b (214d) and 01011011b (91d) = 01010010b (82d)
+    mov ax, 11010110b   ; 214 en binario
+    and ax, 01011011b   ; en ax se guarda el resulta de aplicar el and bit a bit
+
+    ; el and también se podría trabajar con dos registros
+    mov ax, 11010110b
+    mov bx, 01011011b
+    and ax, bx
+    ```
++ O: OR
+    ```asm
+    ; Operación: 214 or 91
+    ; 11010110b es 214 en binario
+    ; 01011011b es 91 en binario
+    ; 11010110b (214d) or 01011011b (91d) = 11011111b (223d)
+    
+    mov ax, 11010110b   ; 214 en binario
+    or ax, 01011011b    ; en ax se guarda el resulta de aplicar el or bit a bit
+
+    ; el and también se podría trabajar con dos registros
+    mov ax, 11010110b
+    mov bx, 01011011b
+    or ax, bx
+    ```
++ Negación: NOT
+    ```asm
+    ; Operación: not 214
+    ; 11010110b es 214 en binario
+    ; not 11010110b (214d) = 00101001b (41d)
+    mov ax, 11010110b   ; 214 en binario
+    not al              ; en ax se guarda la negación de 214 en binario
+    ; si el número hubiese sido mayor a 255 en lugar de al hubiesemos usado ax
+    ```
++ O exclusivo: XOR
+    ```asm
+    ; Operación: 214 or 91
+    ; 11010110b es 214 en binario
+    ; 01011011b es 91 en binario
+    ; 11010110b (214d) xor 01011011b (91d) = 10001101b (141d)
+    mov ax, 11010110b   ; 214 en binario
+    xor ax, 01011011b    ; en ax se guarda el resulta de aplicar el xor bit a bit
+
+    ; el and también se podría trabajar con dos registros
+    mov ax, 11010110b
+    mov bx, 01011011b
+    xor ax, bx
+    ```
+
+#### Relacionales
++ Condiciones y saltos.
+
+
+
