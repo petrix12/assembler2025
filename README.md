@@ -426,4 +426,59 @@ MOV var1, var2
 end main
 ```
 
+## Condiciones y saltos
+### Instruccion de control IF
+#### Diagrama mental para condicionales
+```
+Alto Nivel | Visión en Assembler | Menejo en Assembler
+-----------|---------------------|---------------------
+1. A >  B  | A - B = X           | 1. Positivo
+2. A <  B  | X puede ser:        | 2. Negativo
+3. A == B  | 1. Cero             | 3. Cero
+4. A != B  | 2. Positivo         | 4. No sea cero
+5. A >= B  | 3. Negativo         | 5. Cero o positivo
+6. A <= B  |                     | 6. Cero o negativo
+```
+
+#### Nemónicos para comparaciones
+```
+Assembler | Banderas       | Operación                              | Signo      | Comparación
+----------|----------------|----------------------------------------|------------|-------------
+JA        | Z = 0 y C = 0  | Salta se está por encima               | Sin signo  | >
+JAE       | C = 0          | Salta si está por encima o si es igual | Sin signo  | >=
+JB        | C = 1          | Salta se está por debajo               | Sin signo  | <
+JBE       | Z = 0 y C = 1  | Salta se está por debajo o si es igual | Sin signo  | <=
+JC        | C = 1          | Salta si hay acarreo                   | No importa |
+JE o JZ   | Z = 1          | Salta si es igual o si es cero         |            | =
+JG        | Z = 0 y S = 0  | Salta si es mayor que                  | Con signo  | >
+JGE       | S = 0          | Salta si es mayor o igual que          | Con signo  | >=
+JL        | S != 0         | Salta si es menor que                  | Con signo  | <
+JLE       | Z = 1 o S != 0 | Salta si es menor o igual que          | Con signo  | <=
+JNC       | C = 0          | Salta si no hay acarreo                |            |
+JNE o JNZ | Z = 0          | Salta si no es igual o si no es cero   | No importa | =
+JNO       | O = 0          | Salta si no hay desbordamiento         |            |
+JNS       | S = 0          | Salta si no hay signo (positivo)       |            |
+JNP o JPO | P = 0          | Salta si no hay paridad o si es impar  |            |
+```
+
+#### Nemónico para saltos
++ JMP
+    ```asm
+    jmp X ; ir a la etiqueta X
+    ```
++ Ejemplo
+    ```asm
+    ; ...
+    cmp a, b    ; a - b
+    je L1       ; Si je es cero ir a L1
+    jmp L2      ; Salto a L2
+
+    L1:
+        print("Entro if")
+    
+    L2:
+        print("Fin del programa")
+    ; ...
+    ```
+
 
