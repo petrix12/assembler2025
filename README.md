@@ -11,6 +11,8 @@
     + https://www.DOSBox.com/download.php?main=1
 3. MASM
     + https://sourceforge.net/projects/masm611
+4. Visual Studio Code
+    + https://code.visualstudio.com/download
 
 :::tip Nota
 + Instalar **Emu8086** y **DOSBox** como administrador.
@@ -37,6 +39,8 @@
 
 ## Extensiones de VSC recomendadas
 + MASM | blindtiger | Microsoft Macro Assembler language support for VS Code
++ MASM/TASM | clcxsrolau | run MASM/TASM assembly in DOSBox 
++ Arm Assembly | dan-c-underwood | Arm assembly syntax support for Visual Studio Code
 
 ## Hola Mundo
 1. Crear el siguiente archivo:
@@ -63,8 +67,7 @@
 
             ; terminar programa
             .exit
-        main ENDP   
-
+        main ENDP
     end main
     ```
 2. Abrir **DOSBox** y ejecutar el siguiente código:
@@ -74,7 +77,7 @@
     cd masm611
     cd bin
     ml asm\E01test\Hola.asm
-    hola.exehol
+    hola.exe
     ```
 
 ## Hacer que DOSBox ejecute comando automaticamente
@@ -87,11 +90,32 @@
     cd masm611
     cd bin    
     ```
+:::tip Nota
+Ahora para ejecutar el programa hola.asm será de la siguiente forma al abrir **DOSBox**:
+```bash
+ml asm\E01test\Hola.asm
+hola.exe
+```
+:::
+
 
 ## Comentarios
 ```asm
 ; Esto es un comentario
 ```
+
+## Estructura base de un programa
+```asm
+.model small
+.stack
+.code
+    main PROC
+        ; código el programa
+        .exit
+    mein ENDP
+end main
+```
+
 
 ## Etructura de un programa en MASM
 ### Importación de macros
@@ -427,8 +451,7 @@ end main
 ```
 
 ## Condiciones y saltos
-### Instruccion de control IF
-#### Diagrama mental para condicionales
+### Diagrama mental para condicionales
 ```
 Alto Nivel | Visión en Assembler | Menejo en Assembler
 -----------|---------------------|---------------------
@@ -440,7 +463,7 @@ Alto Nivel | Visión en Assembler | Menejo en Assembler
 6. A <= B  |                     | 6. Cero o negativo
 ```
 
-#### Nemónicos para comparaciones
+### Nemónicos para comparaciones
 ```
 Assembler | Banderas       | Operación                              | Signo      | Comparación
 ----------|----------------|----------------------------------------|------------|-------------
@@ -448,8 +471,8 @@ JA        | Z = 0 y C = 0  | Salta se está por encima               | Sin signo
 JAE       | C = 0          | Salta si está por encima o si es igual | Sin signo  | >=
 JB        | C = 1          | Salta se está por debajo               | Sin signo  | <
 JBE       | Z = 0 y C = 1  | Salta se está por debajo o si es igual | Sin signo  | <=
-JC        | C = 1          | Salta si hay acarreo                   | No importa |
-JE o JZ   | Z = 1          | Salta si es igual o si es cero         |            | =
+JC        | C = 1          | Salta si hay acarreo                   |            |
+JE o JZ   | Z = 1          | Salta si es igual o si es cero         | No importa | =
 JG        | Z = 0 y S = 0  | Salta si es mayor que                  | Con signo  | >
 JGE       | S = 0          | Salta si es mayor o igual que          | Con signo  | >=
 JL        | S != 0         | Salta si es menor que                  | Con signo  | <
@@ -461,7 +484,7 @@ JNS       | S = 0          | Salta si no hay signo (positivo)       |           
 JNP o JPO | P = 0          | Salta si no hay paridad o si es impar  |            |
 ```
 
-#### Nemónico para saltos
+### Nemónico para saltos
 + JMP
     ```asm
     jmp X ; ir a la etiqueta X
@@ -480,5 +503,214 @@ JNP o JPO | P = 0          | Salta si no hay paridad o si es impar  |           
         print("Fin del programa")
     ; ...
     ```
+
+## Sentecias cíclicas y de control
+### Sentencia de control IF
+```asm
+; macro para imprimir un caracter (char)
+printChar macro char
+    mov ah, 02h
+    mov dl, char
+    int 21h
+endm
+
+.model small
+.stack
+.data
+    cond1 db 1b     ; true
+.code
+    main PROC
+        ; importamos variables
+        mov dx, @data   ; gurdamos el puntero de data en dx
+        mov ds, dx      ; recuperamos data en ds
+        xor dx, dx      ; limpiamos dx
+
+        ;--------IF en lenguaje de alto nivel
+        ;   if(cond1) {
+        ;       print('a')
+        ;   } else  {
+        ;       print('b')
+        ;   }
+
+        ;--------IF en Assembler (existen muchas otras formas de simular un IF)
+        cmp cond1, 1b   ; verificar que cond1 sea true
+        je L1           ; si cond1 es true ir a L1
+        jmp L2          ; ir a L2
+        L1:
+            printChar 'a'
+            jmp L3
+        L2:
+            printChar 'b'
+        L3:
+        .exit
+    main ENDP
+end main
+```
+
+### Sentencia de control IF con un OR en la condición
+```asm
+; macro para imprimir un caracter (char)
+printChar macro char
+    mov ah, 02h
+    mov dl, char
+    int 21h
+endm
+
+.model small
+.stack
+.data
+    cond1 db 1b     ; true
+    cond2 db 1b     ; true
+.code
+    main PROC
+        ; importamos variables
+        mov dx, @data   ; gurdamos el puntero de data en dx
+        mov ds, dx      ; recuperamos data en ds
+        xor dx, dx      ; limpiamos dx
+
+        ;--------IF OR en lenguaje de alto nivel
+        ;   if(cond1 or cond2) {
+        ;       print('a')
+        ;   } else  {
+        ;       print('b')
+        ;   }
+
+        ;--------IF OR en Assembler (existen muchas otras formas de simular un IF OR)
+        cmp cond1, 1b   ; verificar que cond1 sea true
+        je L1           ; si cond1 es true ir a L1
+        cmp cond2, 1b   ; verificar que cond1 sea true
+        je L1           ; si cond1 es true ir a L1
+        jmp L2          ; ir a L2
+        L1:
+            printChar 'a'
+            jmp L3
+        L2:
+            printChar 'b'
+        L3:
+        .exit
+    main ENDP
+end main
+```
+
+### Sentencia de control IF con un AND en la condición
+```asm
+; macro para imprimir un caracter (char)
+printChar macro char
+    mov ah, 02h
+    mov dl, char
+    int 21h
+endm
+
+.model small
+.stack
+.data
+    cond1 db 1b     ; true
+    cond2 db 1b     ; true
+.code
+    main PROC
+        ; importamos variables
+        mov dx, @data   ; gurdamos el puntero de data en dx
+        mov ds, dx      ; recuperamos data en ds
+        xor dx, dx      ; limpiamos dx
+
+        ;--------IF AND en lenguaje de alto nivel
+        ;   if(cond1 and cond2) {
+        ;       print('a')
+        ;   } else  {
+        ;       print('b')
+        ;   }
+
+        ;--------IF AND en Assembler (existen muchas otras formas de simular un IF AND)
+        cmp cond1, 1b   ; verificar que cond1 sea true
+        jne L2          ; si cond1 es false ir a L2
+        cmp cond2, 1b   ; verificar que cond1 sea true
+        jne L2          ; si cond1 es false ir a L2
+        jmp L1          ; ir a L1
+        L1:
+            printChar 'a'
+            jmp L3
+        L2:
+            printChar 'b'
+        L3:
+        .exit
+    main ENDP
+end main
+```
++ Otra forma del código anterior ligeramente distinta
+```asm
+; macro para imprimir un caracter (char)
+printChar macro char
+    mov ah, 02h
+    mov dl, char
+    int 21h
+endm
+
+.model small
+.stack
+.data
+    cond1 db 1b     ; true
+    cond2 db 1b     ; true
+.code
+    main PROC
+        ; importamos variables
+        mov dx, @data   ; gurdamos el puntero de data en dx
+        mov ds, dx      ; recuperamos data en ds
+        xor dx, dx      ; limpiamos dx
+
+        ;--------IF AND en lenguaje de alto nivel
+        ;   if(cond1 and cond2) {
+        ;       print('a')
+        ;   } else  {
+        ;       print('b')
+        ;   }
+
+        ;--------IF AND en Assembler (existen muchas otras formas de simular un IF AND)
+        cmp cond1, 1b   ; verificar que cond1 sea true
+        jne L1          ; si cond1 es false ir a L1
+        cmp cond2, 1b   ; verificar que cond1 sea true
+        jne L1          ; si cond1 es false ir a L1        
+        printChar 'a'
+        jmp L2
+        L1:
+            printChar 'b'
+        L2:
+        .exit
+    main ENDP
+end main
+```
+
+### Sentencia de ciclica FOR
+
+```asm
+; macro para imprimir un caracter (char)
+printChar macro char
+    mov ah, 02h
+    mov dl, char
+    int 21h
+endm
+
+.model small
+.stack
+.code
+    main PROC
+        ;--------FOR en lenguaje de alto nivel
+        ;   for n in range(0, 6) {
+        ;       print('a')
+        ;   }
+        ; Salida esperada: aaaaa (5 veces a)
+
+        ;--------FOR en Assembler (existen muchas otras formas de simular un FOR)        
+        xor si, si  ; limpiar las variable de indice
+        CFOR: 
+            cmp si, 5d      ; verificar que si sea igual a 5d
+            je SALIRFOR     ; si es igual a 5d ir a SALIRFOR
+            printChar 'a'   ; imprimir a
+            inc si          ; incrementar si
+            jmp CFOR        ; ir a CFOR
+        SALIRFOR:
+        .exit
+    main ENDP
+end main
+```
 
 
