@@ -853,4 +853,129 @@ end main
 ```
 
 ## Interrupciones
+### Documentación
++ https://helppc.netcore2k.net/interrupt
+
+### Tipos de interrupciones
++ Generadas por hardware
++ Generadas por software
+
+### Tipos de interrupciones por software
++ INT
++ INTO
++ INT 3
+
+:::tip Nota
+Las interrupciones son similares a las instrucciones CALL.
+:::
+
+#### Interrupciones INT
++ Existen 256 instrucciones distintas.
++ Cada instrucción INT tiene un operando numérico cuyo rango es de 0 a 255.
+
+#### Ejemplos sencillos de algunas interrupciones:
++ Imprimir un char**:
+    + INT 21h:  (21h indica que la interrupción puede imprimir un caracter).
+    + AH = 2H   (Se requiere que AH tenga el número 2 en hexadecimal).
+    + DL debe almacenar el valor ASCII a imprimir.
++ Pedir ingreso de char**:
+    + INT 21h:  (21h indica que la interrupción puede leer un caracter).
+    + AH = 1H   (Se requiere que AH tenga el número 1 en hexadecimal).
+    + El char ingresado se guarda en AL.
+
+:::tip Nota
+Para imprimir o leer cadenas de caracteres será necesario apoyarse en sentencias ciclicas.
+:::
+
+#### Algunos operadores importantes
++ **SIZEOF**: devuelve el núemro de bytes utilizados.
++ **OFFSET**: devuelve el desplazamiento de una ubicación de momoria. En otras palabras devuelve la ubicación donde inicia una expresión.
+
+#### Algunos ejemplos de código
+1. Realizar en Assembler una programa que permita el ingreso deun char e imprimirlo:
+    ```asm
+    .model small
+    .stack
+    .data
+        char db ?   ; ? indica que no hemos inicializado a char
+    .code
+        main PROC
+            ; importamos variables
+            mov dx, @data   ; gurdamos el puntero de data en dx
+            mov ds, dx      ; recuperamos data en ds
+            xor dx, dx      ; limpiamos dx
+
+            ; leer un char 
+            mov ah, 1h  ; almacenamos en AH en valor de 1h para poder pedir el ingreso de un char
+            int 21h     ; interrupción que permite la lectura de un char y lo almacena en AL
+            mov char, al    ; almacenamos el char contenido en AL a la varaible char
+
+            ; imprimir un ENTER
+            mov ah, 2h
+            mov dl, 10d
+            int 21h
+
+            ; imprimir el char leido
+            mov ah, 2h      ; almacenamos en AH en valor de 2h para poder pedir la escritura de un char
+            mov dl, char    ; le indicamos a DL el char a imprimir
+            int 21h         ; interrupción que permite la escritura de un char
+
+            .exit
+        main ENDP
+    end main
+    ```
+2. Ampliar el ejercicio anterior para que permita el ingreso de un texto de n chars e imprimirlo:
+    ```asm
+    .model small
+    .stack
+    .data
+        string db ?     ; ? indica que no se ha inicializado la variable
+    .code
+        main PROC
+            ; importamos variables
+            mov dx, @data   ; gurdamos el puntero de data en dx
+            mov ds, dx      ; recuperamos data en ds
+            xor dx, dx      ; limpiamos dx
+
+            ; leer un string
+            xor si, si  ; inicializar contador SI a cero
+            BeginReadString:
+                mov ah, 1h          ; almacenamos en AH en valor de 1h para poder pedir el ingreso de un char
+                int 21h             ; interrupción que permite la lectura de un char y lo almacena en AL
+
+                cmp al, 13d         ; verificar si al es un retorno de carro
+                je EndReadString    ; salir de la lectura del string
+
+                mov string[si], al  ; almacenamos el char contenido de AL en la posición si de string
+                inc si
+                jmp BeginReadString
+            EndReadString:
+            ; ya en este punto, el registro 'SI' tendrá la longitud del string            
+
+            ; imprimir un ENTER
+            mov ah, 2h
+            mov dl, 10d
+            int 21h
+
+            ; imprimir el string leido
+            xor di, di  ; inicializar el otro contador DI a cero
+            BeginWriteString:
+                mov ah, 2h          ; almacenamos en AH en valor de 2h para poder pedir la escritura de un char
+                mov dl, string[di]  ; le indicamos a DL el char a imprimir
+                int 21h             ; interrupción que permite la escritura de un char
+
+                inc di
+                cmp di, si          ; verificamos si hemos llegado al final del string
+                je EndWriteString
+
+                jmp BeginWriteString
+            EndWriteString:
+
+            .exit
+        main ENDP
+    end main
+    ```
+
+
+
 

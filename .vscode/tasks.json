@@ -1,0 +1,37 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Compilar NASM",
+        "type": "shell",
+        "command": "nasm",
+        "args": [
+          "-f",
+          "win64",
+          "${file}",
+          "-o",
+          "${fileDirname}\\${fileBasenameNoExtension}.obj"
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Enlazar ejecutable",
+        "type": "shell",
+        "command": "golink",
+        "args": [
+          "/entry:main",
+          "${fileDirname}\\${fileBasenameNoExtension}.obj"
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": false
+        },
+        "problemMatcher": []
+      }
+    ]
+  }
+  
