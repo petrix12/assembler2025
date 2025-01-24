@@ -1068,5 +1068,139 @@ Para imprimir o leer cadenas de caracteres será necesario apoyarse en sentencia
 end main
 ```
 
+## Procedimientos
+### Crear un procedimiento
+```asm
+nombre_procedimiento proc
+    ; instrucción 1
+    ; instrucción 2
+    ; instrucción 3
+    ; ...
+    ; instrucción n
+    ret
+nombre_procedimiento endp
+```
+
+### Llamar un procedimiento
+```asm
+main proc
+    ; instrucción 1
+    call nombre_procedimiento
+    ; instrucción 2
+    ; instrucción 3
+    ; ...
+    ; instrucción n
+main endp
+```
+
+## Macros
+### Crear una macro
+```asm
+nombre_macro macro
+    ; instrucción 1
+    ; instrucción 2
+    ; instrucción 3
+    ; ...
+    ; instrucción n
+endm
+```
+
+### Llamar una macro
+```asm
+main proc
+    ; instrucción 1
+    nombre_macro
+    ; instrucción 2
+    ; instrucción 3
+    ; ...
+    ; instrucción n
+main endp
+```
+
+### Crear una macro con parametros
+```asm
+nombre_macro macro var1, var2, var3
+    ; instrucción 1
+    ; instrucción 2
+    ; instrucción 3
+    ; ...
+    ; instrucción n
+endm
+```
+
+### Llamar una macro
+```asm
+main proc
+    ; instrucción 1
+    nombre_macro var1, var2, var3
+    ; instrucción 2
+    ; instrucción 3
+    ; ...
+    ; instrucción n
+main endp
+```
+
+:::tip Nota
++ A diferencia de los procedimientos, las macros se incertan en el código.
++ Se pueden utilizar etiquetas locales que no se mezclan con las del procedimiento principal asi se llamen iguales, internamente se les cambiará el nombre:
+    + Macro:
+        ```asm
+        nombre_macro macro
+            LOCAL ETIQUETA1, ETIQUETA2
+            ; instrucción 1
+            ETIQUETA1:
+            ; instrucción 2
+            ; instrucción 3
+            ; ...
+            ETIQUETA2:
+            ; instrucción n
+        endm
+        ```
+    + Procedimiento principal:
+        ```asm
+        main proc
+            ; instrucción 1
+            ETIQUETA1:
+            nombre_macro
+            ; instrucción 2
+            ; instrucción 3
+            ; ...
+            ETIQUETA2:
+            ; instrucción n
+        main endp
+        ```
+:::
+
+### Ejemplo práctico
++ Crear un programa en donde se tenga un procedimiento llamdo "imprimir_msg" y una macro que permita la llamada "print" que haga la tarea de imprimir la variable que se le mande como parámetro:
+    + Programa principal
+        ```asm title="pruebas\P06macros\test_mp.asm"
+        .model small
+        .stack
+        .data
+            msgWelcome db "Bienvenido", 13, 10, '$'
+            msg1 db "Primer mensaje", 13, 10, '$'
+            msg1 db "Segundo mensaje", 13, 10, '$'
+            msg1 db "Tercer mensaje", 13, 10, '$'
+            msg1 db "Cuarto mensaje", 13, 10, '$'
+            msgBye db "Bye", 13, 10, '$'
+        .code
+            main PROC
+                ; Importamos variables
+                mov dx, @data
+                mov ds, dx
+                xor dx, dx
+
+                mov dx, offset msgWelcome
+                mov ah, 9h
+                int 21h               
+
+                .exit
+            main ENDP
+        end main
+        ```
+    + Macro:
+        ```asm title="pruebas\P06macros\macro01.asm"
+        ```
 
 
