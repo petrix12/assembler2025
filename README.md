@@ -1175,32 +1175,54 @@ main endp
 + Crear un programa en donde se tenga un procedimiento llamdo "imprimir_msg" y una macro que permita la llamada "print" que haga la tarea de imprimir la variable que se le mande como parámetro:
     + Programa principal
         ```asm title="pruebas\P06macros\test_mp.asm"
+        include macro01.asm
         .model small
         .stack
         .data
             msgWelcome db "Bienvenido", 13, 10, '$'
             msg1 db "Primer mensaje", 13, 10, '$'
-            msg1 db "Segundo mensaje", 13, 10, '$'
-            msg1 db "Tercer mensaje", 13, 10, '$'
-            msg1 db "Cuarto mensaje", 13, 10, '$'
+            msg2 db "Segundo mensaje", 13, 10, '$'
+            msg3 db "Tercer mensaje", 13, 10, '$'
+            msg4 db "Cuarto mensaje", 13, 10, '$'
             msgBye db "Bye", 13, 10, '$'
         .code
+            ; Procedimiento principal
             main PROC
                 ; Importamos variables
                 mov dx, @data
                 mov ds, dx
                 xor dx, dx
 
-                mov dx, offset msgWelcome
-                mov ah, 9h
-                int 21h               
+                ; llamada al procedimiento imprimir_msg
+                call imprimir_msg 
+
+                ; llamada a la macro print desde el procedimiento main
+                print msgBye
 
                 .exit
             main ENDP
+
+            ; Procedimientos
+            imprimir_msg proc
+                mov dx, offset msgWelcome
+                mov ah, 9h
+                int 21h  
+                ; llamadas a la macro print desde el procedimiento imprimir_msg
+                print msg1
+                print msg2
+                print msg3
+                print msg4
+                ret            
+            imprimir_msg endp
         end main
         ```
     + Macro:
         ```asm title="pruebas\P06macros\macro01.asm"
+        print macro cadena
+            mov dx, offset cadena
+            mov ah, 9h
+            int 21h      
+        endm        
         ```
 
 
